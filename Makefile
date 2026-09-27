@@ -35,6 +35,7 @@ export ADDITIONAL_CFLAGS = -I$(THEOS_PROJECT_DIR)/Tweaks/RemoteLog -I$(THEOS_PRO
 ifneq ($(JAILBROKEN),1)
 export DEBUGFLAG = -ggdb -Wno-unused-command-line-argument -L$(THEOS_OBJ_DIR) -F$(_THEOS_LOCAL_DATA_DIR)/$(THEOS_OBJ_DIR_NAME)/install/Library/Frameworks
 MODULES = jailed
+export SIDELOAD = 1
 endif
 
 $(TWEAK_NAME)_INJECT_DYLIBS = \
@@ -62,6 +63,7 @@ endif
 
 ifeq ($(YTUHD_ENABLED),1)
 $(TWEAK_NAME)_INJECT_DYLIBS += $(THEOS_OBJ_DIR)/YTUHD.dylib
+$(TWEAK_NAME)_EMBED_BUNDLES += $(wildcard Tweaks/YTUHD/layout/Library/Application\ Support/*.bundle)
 endif
 
 $(TWEAK_NAME)_EMBED_LIBRARIES = $(THEOS_OBJ_DIR)/libcolorpicker.dylib
@@ -117,6 +119,11 @@ before-all::
 	perl -pi -e 's/3\.0\.4/3.0.5/g' $(UYOU_DYLIB); \
 	python3 Scripts/rebrand_uyou.py $(UYOU_DYLIB); \
 	$(PRINT_FORMAT_BLUE) "uYou rebranded to 3.0.5 (Unofficial Build)";
+
+ifeq ($(YTUHD_ENABLED),1)
+before-all::
+	@python3 Scripts/prepare_ytuhd.py
+endif
 
 else
 before-package::
